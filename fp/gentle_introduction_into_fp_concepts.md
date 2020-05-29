@@ -166,6 +166,7 @@ public class DataRecord{
 
     public DataRecord(String data, Byte number) {
         this.data = data;
+        this.number = number;
     }
 }
 
