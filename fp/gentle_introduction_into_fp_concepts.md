@@ -73,7 +73,7 @@ public interface Serializable<A> {
     byte[] serialize(A value);
 }
 ```
-Далее, имея такой тип данных
+Далее, определим тип данных
 
 ```java
 public class DataRecord{
@@ -85,7 +85,7 @@ public class DataRecord{
 }
 ```
 
-Реализация контракта будет выглядеть следующим образом
+Реализация контракта для типа `DataRecord` будет выглядеть следующим образом
 ```java
 public class SerializableForDataRecord implements Serializable<DataRecord> {
     @Override
