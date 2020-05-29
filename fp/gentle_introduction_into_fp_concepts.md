@@ -147,3 +147,239 @@ object Main extends App{
     send(DataRecord("My data"))
 }
 ```
+
+Однако данный пример покрывает только тот случай, когда вся необходимая информация предоставлена во время компиляции. Мы вернёмся к вопросу динамического диспатчинга после обьяснения `ADT`.
+
+
+### Algebraic Data Types или ADT и pattern matching
+Функциональное программирование, как все наслышаны, нацелено на преобразование данных. Но как именно определяются типы данных в функциональном мире?
+Всё очень просто, фпшники говорят:
+* Пусть у нас есть базовые типы данных, такие как `String`, `Char`, `Byte`, `Int`, `Double` и т.д.
+* Операция умножения типов, которая работает следующим образом: `String` * `Byte` - это тип пары значений 
+ типа `String` и `Byte`, т.е. буквально, при таком определении
+ ```java
+public class DataRecord{
+    public final String data;
+    public final byte number;
+
+    public DataRecord(String data, Byte number) {
+        this.data = data;
+    }
+}
+
+ ``` 
+  На Scala аналог выглядит так:  
+  ```scala
+  case class DataRecord(data: String, number: Byte)
+  ```
+
+ `DataRecord` является элементом типа `String * Byte`. Соответственно произведение трёх типов - это тип тройки значений и т.д.
+ * Операция сложения типов, которая работает следующим образом: `String` + `Byte` - это либо значение типа `String`, либо значение типа `Byte`. В терминах наследования это выглядит так:
+```java
+ abstract class SumOfByteAndString {}
+ final class ByteVersion extends SumOfByteAndString{
+    public final byte number;
+    
+    public ByteVersion(byte number) {
+        this.number = number;
+    }
+ }
+ final class StringVersion extends SumOfByteAndString{
+    public final String data;
+    
+    public ByteVersion(String data) {
+        this.data = data;
+    }
+ }
+```
+Теперь с помощью `instanceof` мы можем понять в рантайме какая конкретно из альтернатив на пришла.
+Но это не совсем полный аналог функционального сложения типов, потому что оно подразумевает, что других альтернатив быть не может, что не верно для приведённого кода на Java.
+
+На Scala корректная версия произведения типов выглядит так:
+```scala
+sealed trait SumOfStringAndByte
+case class StringVersion(data: String) extends SumOfStringAndByte
+case class ByteVersion(data: Byte) extends SumOfStringAndByte
+```
+Ключевое слово `sealed` означает, что потомков `SumOfStringAndByte` можно определять только в файле, где он определён. Таким образом достигается свойство закрытости, которое не достигается на Java.
+
+### Почему именно эти две операции?
+
+Во-первых, с помощью этих двух операций можно определить все необходимые для переноса данных структуры.
+Во-вторых, если мы знаем, что данные можно определять тольо таким образом, это значит, что мы знаем всё про их структуру, что активно используется при `pattern-matching`.
+
+`Pattern-matching` работает следующим образом.
+```scala
+val sumValue: SumOfStringAndByte = ???
+// ??? просто кидает исключение `NotImplemented`
+sumValue match {
+    case StringVersion(data) => ???
+    case ByteVersion(data)   => ???
+}
+```
+Благодаря тому, что мы знаем, что `SumOfStringAndByte` это сумма типов язык позволяет выполнить исчерпывающий матчинг по возможным альтернативам и мы можем быть уверены, что матчинг будет корректный.
+
+Для произведения типов это выглядит так:
+
+```scala
+val prodValue: DataRecord = ???
+
+prodValue match{
+    //Далее в этом case можно обращаться напрямую к значениям data и number
+    case DataRecord(data: String, number: Byte) => ???
+}
+
+```
+Здесь мы аналогичным образом смогли "заглянуть" внутрь типа, потому что мы знаем, что он был создан с помощью умножения типов.
+
+Более того, паттерн матчинг позволяет "заглядывать в глубину", т.е. имея такой составной тип
+
+```scala
+ case class Inner(number: Int)
+ case class Outer(str: String, inner: Inner)
+
+ val outer: Outer = ???
+
+ outer match {
+     //Можем заглянуть внутрь Inner
+     case Outer(str, Inner(number: Int)) => ???
+ }
+```
+
+Тоже самое справедливо и для суммы типов:
+
+```scala
+sealed trait Outer
+case class OuterLevel() extends Outer
+
+sealed trait Inner extends Outer
+case class InnerLevel() extends Inner
+case class InnerLevelSecond() extends Inner
+
+val outer: Outer = ???
+
+outer match {
+    //Мы видим альтернативы из всех уровней вложенности и исчерпываемость проверяется компилятором
+    case OuterLevel()       => ???
+    case InnerLevel()       => ???
+    case InnerLevelSecond() => ???
+}
+
+//В тоже время имея только Inner мы всё ещё можем делать паттерн матчинг по нему
+val inner: Inner = ???
+
+inner match {
+    case InnerLevel() => ???
+    case InnerLevelSecond() = ???
+}
+
+```
+
+Более того, паттерн матчинг работает, когда у нас используется и сложение и произведение типов:
+
+```scala
+sealed trait Sum
+case class A() extends Sum
+case class B() extends Sum
+
+case class C(str: String, sum: Sum)
+
+
+val c: C = ???
+
+c match {
+    //По альтернативе на каждый вариант Sum
+    case (str, A()) => ???
+    case (str, B()) => ???
+}
+
+sealed trait Sum2
+case class C() extends Sum2
+case class D() extends Sum2
+
+case class TwoSums(sum1: Sum, sum2: Sum2)
+
+val twoSums: TwoSums = ???
+
+twoSums match {
+    //По альтернативе на каждую возможную комбинацию
+    case (A(), C()) => ???
+    case (A(), D()) => ???
+    case (B(), C()) => ???
+    case (B(), D()) => ???
+}
+```
+
+### Наследование
+
+Главной фичой наследования является динамический диспатчинг методов. Он же является и главным недостатком наследования. Динамический диспатчинг методов в наследовании перенасыщен. Кучи оверрайдов и обращения к  `super()` только мешают читать код. Фактически, всё, что мы хотим от наследования - диспатчить вызовы к потомкам. Это необходимый и достаточный минимум.
+
+После обьяснения `ADT` легко заметить, что как раз таки сумма типов позволяет реализовать тот самый необходимый нам диспатчинг.
+
+Допустим мы хотим сделать обобщённый контракт получения длины какой-то коллекции, на Java это будет выглядеть как-то так:
+
+```java
+interface Length{
+    int length();
+}
+
+class MyListWithLength<A> implements Length{
+    final List<A> list;
+
+    public <A> MyListWithLength(List<A> list){
+        this.list = list;
+    }
+
+    @Override
+    int length(){
+      return list.length();   
+    }
+}
+
+class MyStringWithLength implements Length{
+    final String str;
+
+    public MyStringWithLength(String str){
+        this.str = str;
+    }
+    
+    @Override
+    int length(){
+      return str.length();   
+    }
+}
+
+//
+
+public static void printLength(Length data) {
+    System.out.println("Length" + data.length());
+    //Реализуйте свою логику отправления байтов по сети
+}
+
+public static void main(String[] args) {
+    printLength(new MyStringWithLength("Мои данные"));
+    printLength(new MyListWithLength(Arrays.asList(1, 2, 3)));
+}
+```
+
+На Scala это выглядит следующим образом:
+```scala
+trait Length[A]{
+    def length(value: A)
+}
+
+object Length{
+    implicit val stringInstance: Length[String] = new Length[String]{
+        def length(value: String) = value.length
+    }
+    implicit val listInstance: Length[List[_]] = new Length[List[_]]{
+        def length(value: List[_]) = value.length
+    }  
+}
+
+
+object Main extends App{
+    def printLength
+}
+
+```
