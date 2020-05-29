@@ -351,12 +351,16 @@ class MyStringWithLength implements Length{
 
 //
 
+public static Length someParsedElement = throw new Exception("Not implemented")
+
 public static void printLength(Length data) {
     System.out.println("Length" + data.length());
     //Реализуйте свою логику отправления байтов по сети
 }
 
 public static void main(String[] args) {
+    //В рантайме вызовет нужный метод
+    printLength(someParsedElement);
     printLength(new MyStringWithLength("Мои данные"));
     printLength(new MyListWithLength(Arrays.asList(1, 2, 3)));
 }
@@ -368,18 +372,36 @@ trait Length[A]{
     def length(value: A)
 }
 
+sealed trait StringOrIntList
+case class StringWrapper(str: String) extends StringOrIntList
+case class IntListWrapper(list: List[Int]) extends StringOrIntList
+
 object Length{
-    implicit val stringInstance: Length[String] = new Length[String]{
-        def length(value: String) = value.length
+    implicit val stringInstance: Length[StringWrapper] = new Length[StringWrapper]{
+        def length(value: StringWrapper) = value.str.length
     }
-    implicit val listInstance: Length[List[_]] = new Length[List[_]]{
-        def length(value: List[_]) = value.length
+    implicit val listInstance: Length[IntListWrapper] = new Length[IntListWrapper]{
+        def length(value: IntListWrapper) = value.list.length
+    }  
+    //Инстанс для диспатчинга(бойлерплейт от которого можно и нужно избавиться макросами, приведён без них для простоты)
+    implicit val stringOrIntListInstance: Length[StringOrIntList] = new Length[StringOrIntList]{
+        def length(value: StringOrIntList) = value match {
+            case wrapper@IntListWrapper(_)  => Length[IntListWrapper].length(wrapper)
+            case wrapper@StringWrapper(_)   => Length[StringWrapper].length(wrapper)
+        }
     }  
 }
 
 
 object Main extends App{
-    def printLength
+    def parse: StringOrIntList = ???
+
+    def printLength[A: Length](value: A) = println(s"Length: ${Length[A].length(value)}")
+
+    //То же самое, что printLength[StringOrIntList](value)(stringOrIntListInstance)
+    printLength(parse)
 }
 
 ```
+
+Таким образом мы получили диспатчинг без наследования, используя `ADT` и `typeclasses`.
