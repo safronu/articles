@@ -395,7 +395,8 @@ object Length{
     implicit val listInstance: Length[IntListWrapper] = new Length[IntListWrapper]{
         def length(value: IntListWrapper) = value.list.length
     }  
-    //Инстанс для диспатчинга(бойлерплейт от которого можно и нужно избавиться макросами, приведён без них для простоты)
+    //Инстанс для диспатчинга
+    //(бойлерплейт от которого можно и нужно избавиться макросами, приведён без них для простоты)
     implicit val stringOrIntListInstance: Length[StringOrIntList] = new Length[StringOrIntList]{
         def length(value: StringOrIntList) = value match {
             case wrapper@IntListWrapper(_)  => Length[IntListWrapper].length(wrapper)
