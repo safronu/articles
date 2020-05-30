@@ -357,10 +357,10 @@ val twoSums: TwoSums = ???
 
 twoSums match {
     //По альтернативе на каждую возможную комбинацию
-    case (A(), C()) => ???
-    case (A(), D()) => ???
-    case (B(), C()) => ???
-    case (B(), D()) => ???
+    case TwoSums(A(), C()) => ???
+    case TwoSums(A(), D()) => ???
+    case TwoSums(B(), C()) => ???
+    case TwoSums(B(), D()) => ???
 }
 ```
 
