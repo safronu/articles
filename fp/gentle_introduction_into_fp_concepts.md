@@ -343,8 +343,8 @@ val c: C = ???
 
 c match {
     //По альтернативе на каждый вариант Sum
-    case (str, A()) => ???
-    case (str, B()) => ???
+    case С(str, A()) => ???
+    case С(str, B()) => ???
 }
 
 sealed trait Sum2
