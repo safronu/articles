@@ -1,5 +1,7 @@
 # Введение в промышленное функциональное программирование
 
+TODO: Сделать введение
+
 ## Typeclass
 
 ### Обьектно-ориентированный подход к полиморфизму
@@ -15,7 +17,7 @@ public interface Serializable {
 }
 ```
 
-Теперь, чтобы для какого-то типа, например такого
+Допустим у нас некий тип `DataRecord`, определенный вот так:
 ```java
 public class DataRecord{
     public final String data;
@@ -51,7 +53,7 @@ public class DataRecord implements Serializable {
 ```java
 public static void send(Serializable data) {
     byte[] bytes = data.serialize();
-    //Реализуйте свою логику отправления байтов по сети
+    //Реализуйте свою логику отправки байтов по сети
 }
 
 public static void main(String[] args) {
@@ -99,7 +101,7 @@ public class SerializableForDataRecord implements Serializable<DataRecord> {
 ```java
 public static <A> void send(A data, Serializable<A> serializer) {
     byte[] bytes = serializer.serialize(data);
-    //Реализуйте свою логику отправления байтов по сети
+    //Реализуйте свою логику отправки байтов по сети
 }
 ```
 
@@ -367,7 +369,7 @@ public static Length someParsedElement = throw new Exception("Not implemented")
 
 public static void printLength(Length data) {
     System.out.println("Length" + data.length());
-    //Реализуйте свою логику отправления байтов по сети
+    //Реализуйте свою логику отправки байтов по сети
 }
 
 public static void main(String[] args) {
