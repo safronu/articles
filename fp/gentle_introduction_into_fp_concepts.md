@@ -256,9 +256,13 @@ case class ByteVersion(data: Byte) extends SumOfStringAndByte
 `Pattern-matching` работает следующим образом:
 
 ```scala
+// ??? просто кидает исключение `NotImplemented`, 
+// будем его использовать его как стаб реализаций, которые не важны
+
+//Значение sumValue типа SumOfStringAndByte
 val sumValue: SumOfStringAndByte = ???
-// ??? просто кидает исключение `NotImplemented`
 sumValue match {
+    //2 альтернативы, по одной на каждого "наследника" SumOfStringAndByte
     case StringVersion(data) => ???
     case ByteVersion(data)   => ???
 }
