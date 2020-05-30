@@ -443,7 +443,7 @@ object Length{
         def length(value: IntListWrapper) = value.list.length
     }  
     //Инстанс для диспатчинга
-    //(бойлерплейт от которого можно и нужно избавиться макросами, приведён без них для простоты)
+    //(бойлерплейт от которого можно и нужно избавляться макросами, приведён без них для простоты)
     implicit val stringOrIntListInstance: Length[StringOrIntList] = new Length[StringOrIntList]{
         def length(value: StringOrIntList) = value match {
             //Для каждого кейса мы вызываем соответствующий инстанс Length
