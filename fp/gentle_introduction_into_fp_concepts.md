@@ -425,10 +425,12 @@ public static void main(String[] args) {
 На Scala это выглядит следующим образом:
 
 ```scala
+//Целевой контракт(интерфейс)
 trait Length[A]{
     def length(value: A)
 }
 
+//Тип равный сумме типов String и List[Int]
 sealed trait StringOrIntList
 case class StringWrapper(str: String) extends StringOrIntList
 case class IntListWrapper(list: List[Int]) extends StringOrIntList
@@ -444,6 +446,7 @@ object Length{
     //(бойлерплейт от которого можно и нужно избавиться макросами, приведён без них для простоты)
     implicit val stringOrIntListInstance: Length[StringOrIntList] = new Length[StringOrIntList]{
         def length(value: StringOrIntList) = value match {
+            //Для каждого кейса мы вызываем его инстанс Length
             case wrapper@IntListWrapper(_)  => Length[IntListWrapper].length(wrapper)
             case wrapper@StringWrapper(_)   => Length[StringWrapper].length(wrapper)
         }
