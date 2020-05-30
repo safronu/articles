@@ -348,8 +348,8 @@ c match {
 }
 
 sealed trait Sum2
-case class C() extends Sum2
 case class D() extends Sum2
+case class E() extends Sum2
 
 case class TwoSums(sum1: Sum, sum2: Sum2)
 
@@ -357,10 +357,10 @@ val twoSums: TwoSums = ???
 
 twoSums match {
     //По альтернативе на каждую возможную комбинацию
-    case TwoSums(A(), C()) => ???
     case TwoSums(A(), D()) => ???
-    case TwoSums(B(), C()) => ???
+    case TwoSums(A(), E()) => ???
     case TwoSums(B(), D()) => ???
+    case TwoSums(B(), E()) => ???
 }
 ```
 
