@@ -447,6 +447,7 @@ object Length{
     implicit val stringOrIntListInstance: Length[StringOrIntList] = new Length[StringOrIntList]{
         def length(value: StringOrIntList) = value match {
             //Для каждого кейса мы вызываем соответствующий инстанс Length
+            //wrappper - переменная типа соответстующая каждому кейсу
             case wrapper@IntListWrapper(_)  => listInstance.length(wrapper)
             case wrapper@StringWrapper(_)   => stringInstance.length(wrapper)
         }
