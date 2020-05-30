@@ -261,6 +261,8 @@ case class ByteVersion(data: Byte) extends SumOfStringAndByte
 
 //Значение sumValue типа SumOfStringAndByte
 val sumValue: SumOfStringAndByte = ???
+//С помощью ключевого слова match мы можем провести 
+//pattern matching по конкретной переменной
 sumValue match {
     //2 альтернативы, по одной на каждого "наследника" SumOfStringAndByte
     case StringVersion(data) => ???
