@@ -446,7 +446,7 @@ object Length{
     //(бойлерплейт от которого можно и нужно избавиться макросами, приведён без них для простоты)
     implicit val stringOrIntListInstance: Length[StringOrIntList] = new Length[StringOrIntList]{
         def length(value: StringOrIntList) = value match {
-            //Для каждого кейса мы вызываем его инстанс Length
+            //Для каждого кейса мы вызываем соответствующий инстанс Length
             case wrapper@IntListWrapper(_)  => listInstance.length(wrapper)
             case wrapper@StringWrapper(_)   => stringInstance.length(wrapper)
         }
