@@ -407,7 +407,7 @@ class MyStringWithLength implements Length{
 
 //
 
-public static Length someParsedElement = throw new Exception("Not implemented")
+public static Length someParsedElement = throw new Exception("Not implemented");
 
 public static void printLength(Length data) {
     System.out.println("Length" + data.length());
