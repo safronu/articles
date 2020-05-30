@@ -454,7 +454,7 @@ object Main extends App{
 
     def printLength[A: Length](value: A) = println(s"Length: ${Length[A].length(value)}")
 
-    //То же самое, что printLength[StringOrIntList](value)(stringOrIntListInstance)
+    //То же самое, что printLength[StringOrIntList](parse)(stringOrIntListInstance)
     printLength(parse)
 }
 
