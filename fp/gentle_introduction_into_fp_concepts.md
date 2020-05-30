@@ -125,28 +125,38 @@ public static void main(String[] args) {
 В Scala с имплиситами этот код выглядит следующим образом:
 
 ```Scala
-
+//trait - аналог интерфейса в Scala, 
+//мы будем его использовать в таких же целях, что и interface в Java
 trait Serializable[A]{
     def serialize(value: A): Array[Byte]
 }
 object Serializable{
+    //Этот метод позволяет в коде, где в есть в скоупе инстанс 
+    //Serializable для типа A получать его c помощью записи Serializable[A]
+    //т.е., если вы пишите Serializable[DataRecord], то вы просто получите инстанс типа Serializable[DataRecord],
+    //если таковой есть в скоупе.
     def apply[A: Serializable]: Serializable[A] = implicitly
 }
 
 case class DataRecord(data: String)
 
 object DataRecord{
+    //Здесь мы определяем реализацию Serializable для DataRecord
     implicit val serializable: Serializable[DataRecord] = new Serializable[DataRecord]{
         def serialize(value: DataRecord) = value.data.getBytes
     }
 }
 
 object Main extends App{
+    //С помощью A: Serializable мы говорим, что метод принимает 
+    //значение любого типа A, для которого есть инстанс Serializable
     def send[A: Serializable](value: A) = {
         val bytes = Serializable[A].serialize(value)
         //Ваш код по отправлению байтов
     }
 
+    //Аналог записи send[DataRecord](DataRecord("My data))(DataRecord.serializable)
+    //Однако это очевидная для компилятора вещь и он может это понять и без лишнего бойлерплейта 
     send(DataRecord("My data"))
 }
 ```
