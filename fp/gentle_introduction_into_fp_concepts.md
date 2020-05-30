@@ -257,7 +257,7 @@ case class ByteVersion(data: Byte) extends SumOfStringAndByte
 
 ```scala
 // ??? просто кидает исключение `NotImplemented`, 
-// будем использовать его как стаб реализаций, которые не важны
+// будем использовать его как заглушку, которые не важны
 
 //Значение sumValue типа SumOfStringAndByte
 val sumValue: SumOfStringAndByte = ???
