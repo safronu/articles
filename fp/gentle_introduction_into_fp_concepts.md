@@ -223,7 +223,7 @@ public class DataRecord{
  final class StringVersion extends SumOfByteAndString{
     public final String data;
     
-    public ByteVersion(String data) {
+    public StringVersion(String data) {
         this.data = data;
     }
  }
