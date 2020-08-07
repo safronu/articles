@@ -427,7 +427,7 @@ public static void main(String[] args) {
 ```scala
 //Целевой контракт(интерфейс)
 trait Length[A]{
-    def length(value: A)
+    def length(value: A): Int
 }
 
 //Тип равный сумме типов String и List[Int]
